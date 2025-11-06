@@ -5,6 +5,7 @@ class UI {
     this.initGrid();
     this.initControls();
     this.initTheme();
+    this.initSampleSelectors();
   }
 
   initGrid() {
@@ -28,6 +29,43 @@ class UI {
     });
   }
 
+  initSampleSelectors() {
+    const categories = this.sequencer.audioInterface.getSampleCategories();
+    const trackRows = document.querySelectorAll('.track-row');
+
+    trackRows.forEach((row, trackIndex) => {
+      const category = categories[trackIndex];
+      const select = document.createElement('select');
+      select.className = 'sample-selector';
+      select.dataset.track = trackIndex;
+
+      category.samples.forEach((sampleName, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        // Clean up the sample name for display
+        const displayName = sampleName
+          .replace(category.prefix, '')
+          .replace('.flac', '')
+          .replace(/_/g, ' ')
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        option.textContent = displayName;
+        select.appendChild(option);
+      });
+
+      select.addEventListener('change', (e) => {
+        const sampleIndex = parseInt(e.target.value);
+        console.log("changing to", trackIndex, sampleIndex)
+        this.sequencer.audioInterface.setSample(trackIndex, sampleIndex);
+      });
+
+      // Insert the select before the steps container
+      const label = row.querySelector('.track-label');
+      label.parentNode.insertBefore(select, label.nextSibling);
+    });
+  }
+
   initControls() {
     const playBtn = document.getElementById('play-pause');
     const rewindBtn = document.getElementById('rewind');
@@ -43,11 +81,24 @@ class UI {
     });
 
     playBtn.addEventListener('click', async () => {
-
       if (!this.sequencer.audioInterface.initialised) {
         document.getElementById('loading').classList.remove("hidden");
-        await this.sequencer.audioInterface.init();
-        document.getElementById('loading').classList.add("hidden");
+        playBtn.disabled = true;
+        playBtn.textContent = '⏳ Loading...';
+
+        try {
+          await this.sequencer.audioInterface.init();
+          document.getElementById('loading').classList.add("hidden");
+        } catch (error) {
+          console.error('Failed to initialize audio:', error);
+          alert('Failed to load audio. Please refresh and try again.');
+          document.getElementById('loading').classList.add("hidden");
+          playBtn.disabled = false;
+          playBtn.textContent = '▶ Play';
+          return;
+        }
+
+        playBtn.disabled = false;
       }
 
       if (this.sequencer.isPlaying) {

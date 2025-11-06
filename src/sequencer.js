@@ -66,7 +66,18 @@ class Sequencer {
 
     if (newStep !== this.currentStep) {
       this.currentStep = newStep;
-      return this.getActiveStep(this.currentStep);
+      const activeSteps = this.getActiveStep(this.currentStep);
+
+      // Trigger audio for active steps
+      if (this.audioInterface.initialised) {
+        activeSteps.forEach((isActive, trackIndex) => {
+          if (isActive) {
+            this.audioInterface.playSample(trackIndex);
+          }
+        });
+      }
+
+      return activeSteps;
     }
 
     return null;
