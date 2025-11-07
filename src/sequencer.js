@@ -6,10 +6,9 @@ class Sequencer {
     this.numSteps = numSteps;
     this.pattern = Array(numTracks).fill(null).map(() => Array(numSteps).fill(false));
     this.isPlaying = false;
-    this.currentStep = 0;
+    this.currentStep = -1;
     this.tempo = 120;
     this.startTime = 0;
-    this.listeners = [];
     this.loadDefaultPattern();
     this.audioInterface = new AudioInterface();
   }
@@ -44,7 +43,7 @@ class Sequencer {
   }
 
   rewind() {
-    this.currentStep = 0;
+    this.currentStep = -1;
     this.startTime = performance.now();
   }
 
@@ -67,11 +66,11 @@ class Sequencer {
     if (newStep !== this.currentStep) {
       this.currentStep = newStep;
       const activeSteps = this.getActiveStep(this.currentStep);
-
       // Trigger audio for active steps
       if (this.audioInterface.initialised) {
         activeSteps.forEach((isActive, trackIndex) => {
           if (isActive) {
+            console.log(`Playing sample on track ${trackIndex} at time ${time}, current step ${this.currentStep}`)
             this.audioInterface.playSample(trackIndex);
           }
         });

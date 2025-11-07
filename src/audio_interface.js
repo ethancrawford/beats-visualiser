@@ -117,8 +117,6 @@ class AudioInterface {
 
     this.initialised = true;
     console.log('[Audio] Initialized with', bufferIndex, 'samples');
-    console.log('[Audio] Sample buffers:', this.sampleBuffers);
-    console.log('[Audio] Current samples:', this.currentSamples);
     return this.sonic;
   }
 
@@ -131,7 +129,6 @@ class AudioInterface {
 
     const sampleIndex = this.currentSamples[trackIndex];
     const bufferIndex = this.sampleBuffers[trackIndex][sampleIndex];
-    console.log(`[Audio] Track ${trackIndex}: currentSample=${sampleIndex}, bufferIndex=${bufferIndex}`);
 
     if (bufferIndex === undefined) {
       console.warn(`No buffer found for track ${trackIndex}, sample ${sampleIndex}`);
@@ -147,7 +144,7 @@ class AudioInterface {
       "buf",
       bufferIndex,
       "amp",
-      1.0,
+      0.5,
       "pan",
       0
     );

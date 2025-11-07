@@ -56,10 +56,9 @@ class UI {
 
       select.addEventListener('change', (e) => {
         const sampleIndex = parseInt(e.target.value);
-        console.log("changing to", trackIndex, sampleIndex)
         this.sequencer.audioInterface.setSample(trackIndex, sampleIndex);
       });
-
+      this.sequencer.audioInterface.setSample(trackIndex, 0);
       // Insert the select before the steps container
       const label = row.querySelector('.track-label');
       label.parentNode.insertBefore(select, label.nextSibling);
@@ -147,7 +146,7 @@ class UI {
     const progress = this.sequencer.getProgress();
     const playhead = document.getElementById('playhead');
     const stepsWidth = document.querySelector('.steps').offsetWidth;
-    playhead.style.left = `76px`;
+    playhead.style.left = `155px`;
     playhead.style.transform = `translateX(${progress * stepsWidth}px)`;
   }
 }
